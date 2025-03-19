@@ -15,7 +15,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # Install explicit dependencies from requirements.txt
-          pip install -r requirements.txt
+          pip install -r requests
+          pip install -r bs4
+          pip install -r alive_progress
           # Install additional dependencies if needed
           pip install requests urllib3 certifi
           # Install the package in development mode
