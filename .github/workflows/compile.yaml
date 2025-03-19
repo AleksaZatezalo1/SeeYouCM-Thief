@@ -17,17 +17,14 @@ jobs:
           # Install dependencies
           pip install requests bs4 alive_progress
           pip install urllib3 certifi
-          # Skip tests or create test files
-          mkdir -p tests
-          echo "<html></html>" > tests/cisco-CP-8861.html
-          # Install the package in development mode
-          pip install -e .
+          # Install the package in development mode (skip running tests)
+          pip install --no-build-isolation -e .
           # Install PyInstaller
           pip install pyinstaller
       - name: Build executable
         run: |
           # Create a simple entry point script
-          echo 'import sys; from SeeYouCM_Thief import seeYouCM; sys.exit(seeYouCM.main())' > seeYouCM_launcher.py
+          echo 'import sys; from SeeYouCM_Thief.thief import main; sys.exit(main())' > seeYouCM_launcher.py
           # Use this entry script for PyInstaller
           pyinstaller --onefile --name SeeYouCM_Thief_windows_amd64.exe seeYouCM_launcher.py
       - name: Create zip file
