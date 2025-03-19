@@ -1,0 +1,38 @@
+name: Build SeeYouCM-Thief Windows Executable
+on:
+  workflow_dispatch: # This allows manual triggering
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install SeeYouCM-Thief and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install explicit dependencies from requirements.txt
+          pip install -r requirements.txt
+          # Install additional dependencies if needed
+          pip install requests urllib3 certifi
+          # Install the package in development mode
+          pip install -e .
+          # Install PyInstaller
+          pip install pyinstaller
+      - name: Build executable
+        run: |
+          # Create a simple entry point script
+          echo 'import sys; from SeeYouCM_Thief import seeYouCM; sys.exit(seeYouCM.main())' > seeYouCM_launcher.py
+          # Use this entry script for PyInstaller
+          pyinstaller --onefile --name SeeYouCM_Thief_windows_amd64.exe seeYouCM_launcher.py
+      - name: Create zip file
+        run: |
+          Compress-Archive -Path .\\dist\\SeeYouCM_Thief_windows_amd64.exe -DestinationPath SeeYouCM_Thief_windows.zip
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SeeYouCM-Thief-windows
+          path: SeeYouCM_Thief_windows.zip
