@@ -7,10 +7,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      
       - name: Install SeeYouCM-Thief and dependencies
         run: |
           python -m pip install --upgrade pip
@@ -21,17 +23,35 @@ jobs:
           pip install --no-build-isolation -e .
           # Install PyInstaller
           pip install pyinstaller
+      
+      - name: Debug - List directory contents
+        run: |
+          dir
+          if (Test-Path "SeeYouCM_Thief") { dir "SeeYouCM_Thief" }
+      
       - name: Build executable
         run: |
           # Create a simple entry point script
-          echo 'import sys; from SeeYouCM_Thief.thief import main; sys.exit(main())' > seeYouCM_launcher.py
+          echo "import sys`nfrom thief import main`nsys.exit(main())" > seeYouCM_launcher.py
           # Use this entry script for PyInstaller
           pyinstaller --onefile --name SeeYouCM_Thief_windows_amd64.exe seeYouCM_launcher.py
+      
+      - name: Debug - Check if executable was created
+        run: |
+          dir dist
+      
       - name: Create zip file
         run: |
-          Compress-Archive -Path .\\dist\\SeeYouCM_Thief_windows_amd64.exe -DestinationPath SeeYouCM_Thief_windows.zip
+          Compress-Archive -Path dist\SeeYouCM_Thief_windows_amd64.exe -DestinationPath SeeYouCM_Thief_windows.zip -Force
+      
+      - name: Debug - Check if zip was created
+        run: |
+          dir
+          if (Test-Path "SeeYouCM_Thief_windows.zip") { echo "Zip file exists" } else { echo "Zip file does not exist" }
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SeeYouCM_Thief_windows
+          name: SeeYouCM-Thief-windows
           path: SeeYouCM_Thief_windows.zip
+          if-no-files-found: error  # This will make the step fail if the file is not found
